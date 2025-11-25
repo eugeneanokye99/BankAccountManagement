@@ -1,0 +1,3 @@
+//Interface
+public class Transactable {
+}
