@@ -1,3 +1,0 @@
-//Interface
-public class Transactable {
-}
