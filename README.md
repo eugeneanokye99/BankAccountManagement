@@ -62,6 +62,7 @@ A comprehensive console-based banking application built with Java that demonstra
    ├── account/
    │   ├── Account.java
    │   ├── SavingsAccount.java
+   |   ├── AccountManager.java
    │   └── CheckingAccount.java
    ├── customer/
    │   ├── Customer.java
@@ -69,10 +70,8 @@ A comprehensive console-based banking application built with Java that demonstra
    │   └── PremiumCustomer.java
    ├── transaction/
    │   ├── Transactable.java
+   |   ├── TransactionManager.java
    │   └── Transaction.java
-   ├── manager/
-   │   ├── AccountManager.java
-   │   └── TransactionManager.java
    └── Main.java
    ```
 
@@ -174,16 +173,6 @@ BANK ACCOUNT MANAGEMENT - MAIN MENU
     - View history for accounts with transactions
     - Verify summary calculations
 
-## 📊 Grading Rubric Compliance
-
-| Criteria | Points | Status |
-|----------|--------|---------|
-| OOP Principles | 25 | ✅ Fully Implemented |
-| Functionality | 25 | ✅ All 5 User Stories Working |
-| Class Design | 15 | ✅ 11 Classes with Proper Relationships |
-| DSA | 15 | ✅ Efficient Data Management |
-| Code Quality | 10 | ✅ Clean Code with Validation |
-| Documentation | 10 | ✅ README and Comments |
 
 ## 🐛 Troubleshooting
 
