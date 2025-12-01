@@ -59,29 +59,6 @@ public class AccountManager {
         System.out.println("Total Bank Balance: $" + String.format("%.2f", totalBalance));
     }
 
-    public void displayAccountDetails(String accountNumber) {
-        Account account = findAccount(accountNumber);
-        if (account != null) {
-            System.out.println("\n=== ACCOUNT DETAILS ===");
-            account.displayAccountDetails();
-        } else {
-            System.out.println("Account not found!");
-        }
-    }
-
-    // Get total balance of all accounts
-    public double getTotalBalance() {
-        double total = 0;
-        for (int i = 0; i < accountCount; i++) {
-            total += accounts[i].getBalance();
-        }
-        return total;
-    }
-
-    // Get number of accounts
-    public int getAccountCount() {
-        return accountCount;
-    }
 
     // Get all accounts (for TransactionManager)
     public Account[] getAccounts() {

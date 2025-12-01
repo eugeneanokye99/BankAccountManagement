@@ -2,6 +2,7 @@ package account;
 
 import customer.Customer;
 import transaction.Transactable;
+import utils.CustomUtils;
 
 public abstract class Account implements Transactable {
     private final String accountNumber;
@@ -63,6 +64,45 @@ public abstract class Account implements Transactable {
         return true;
     }
 
+    public boolean transfer(Account targetAccount, double amount) {
+        if (targetAccount == null) {
+            CustomUtils.printError("Target account cannot be null");
+            return false;
+        }
+
+        if (this == targetAccount) {
+            CustomUtils.printError("Cannot transfer to the same account");
+            return false;
+        }
+
+        if (amount <= 0) {
+            CustomUtils.printError("Transfer amount must be positive");
+            return false;
+        }
+
+        // Check if source account has sufficient funds
+        if (amount > this.balance) {
+            CustomUtils.printError("Insufficient funds for transfer");
+            return false;
+        }
+
+        try {
+            // Withdraw from source account
+            boolean withdrawalSuccess = this.withdraw(amount);
+            if (!withdrawalSuccess) {
+                return false;
+            }
+
+            // Deposit to target account
+            targetAccount.deposit(amount);
+
+            return true;
+        } catch (Exception e) {
+            CustomUtils.printError("Transfer failed: " + e.getMessage());
+            return false;
+        }
+    }
+
     // Implement Transactable interface
     @Override
     public boolean processTransaction(double amount, String type) {
@@ -80,9 +120,4 @@ public abstract class Account implements Transactable {
         }
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s | %s | Balance: $%.2f | %s",
-                accountNumber, getAccountType(), balance, status);
-    }
 }

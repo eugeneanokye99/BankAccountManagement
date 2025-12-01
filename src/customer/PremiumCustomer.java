@@ -8,13 +8,6 @@ public class PremiumCustomer extends Customer {
         this.minimumBalance = 10000.0; // $10,000 minimum for premium status
     }
 
-    public double getMinimumBalance() {
-        return minimumBalance;
-    }
-
-    public boolean hasWaivedFees() {
-        return true; // Premium customers don't pay monthly fees
-    }
 
     @Override
     public void displayCustomerDetails() {

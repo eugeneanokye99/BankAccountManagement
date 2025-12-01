@@ -208,59 +208,160 @@ public class Main {
             CustomUtils.printInline("Enter Account Number: ");
             String accountNumber = scanner.nextLine();
 
-            Account account = accountManager.findAccount(accountNumber);
-            if (account == null) {
+            Account sourceAccount = accountManager.findAccount(accountNumber);
+            if (sourceAccount == null) {
                 CustomUtils.printError("Account not found!");
                 return;
             }
 
             // Display account details
             CustomUtils.print("\nAccount Details:");
-            CustomUtils.print("Customer: " + account.getCustomer().getName());
-            CustomUtils.print("Account Type: " + account.getAccountType());
-            CustomUtils.print("Current Balance: $" + String.format("%.2f", account.getBalance()));
+            CustomUtils.print("Customer: " + sourceAccount.getCustomer().getName());
+            CustomUtils.print("Account Type: " + sourceAccount.getAccountType());
+            CustomUtils.print("Current Balance: $" + String.format("%.2f", sourceAccount.getBalance()));
 
             CustomUtils.print("\nTransaction type:");
             CustomUtils.print("1. Deposit");
             CustomUtils.print("2. Withdrawal");
+            CustomUtils.print("3. Transfer");
             int transactionType = InputValidator.getValidInt(scanner,
-                    "Select type (1-2): ",
-                    1, 2);
+                    "Select type (1-3): ",
+                    1, 3);
 
-            double amount = InputValidator.getValidDouble(scanner,
-                    "Enter amount: $",
-                    0.01);
-
-            String type = (transactionType == 1) ? "DEPOSIT" : "WITHDRAWAL";
-            double previousBalance = account.getBalance();
-            double newBalance = (transactionType == 1) ? previousBalance + amount : previousBalance - amount;
-
-            displayTransactionConfirmation(accountNumber, type, amount, previousBalance, newBalance);
-
-            String confirm = InputValidator.getValidInput(scanner,
-                    "\nConfirm transaction? (Y/N): ",
-                    InputValidator::isValidConfirmation,
-                    "Please enter Y or N");
-
-            if (confirm.equalsIgnoreCase("Y")) {
-                boolean success = account.processTransaction(amount, type);
-                if (success) {
-                    // Create and record transaction
-                    Transaction transaction = new Transaction(accountNumber, type, amount, account.getBalance());
-                    transactionManager.addTransaction(transaction);
-
-                    CustomUtils.printSuccess("Transaction completed successfully!");
-                    CustomUtils.print("New Balance: $" + String.format("%.2f", account.getBalance()));
-                } else {
-                    CustomUtils.printError("Transaction failed!");
-                }
+            if (transactionType == 3) {
+                // Handle transfer
+                handleTransfer(sourceAccount);
             } else {
-                CustomUtils.print("Transaction cancelled.");
+                // Handle deposit/withdrawal (existing code)
+                handleDepositWithdrawal(sourceAccount, transactionType);
             }
 
         } catch (Exception e) {
             CustomUtils.printError("Error processing transaction: " + e.getMessage());
         }
+    }
+
+    private static void handleDepositWithdrawal(Account account, int transactionType) {
+        double amount = InputValidator.getValidDouble(scanner,
+                "Enter amount: $",
+                0.01);
+
+        String type = (transactionType == 1) ? "DEPOSIT" : "WITHDRAWAL";
+        double previousBalance = account.getBalance();
+        double newBalance = (transactionType == 1) ? previousBalance + amount : previousBalance - amount;
+
+        displayTransactionConfirmation(account.getAccountNumber(), type, amount, previousBalance, newBalance);
+
+        String confirm = InputValidator.getValidInput(scanner,
+                "\nConfirm transaction? (Y/N): ",
+                InputValidator::isValidConfirmation,
+                "Please enter Y or N");
+
+        if (confirm.equalsIgnoreCase("Y")) {
+            boolean success = account.processTransaction(amount, type);
+            if (success) {
+                // Create and record transaction
+                Transaction transaction = new Transaction(account.getAccountNumber(), type, amount, account.getBalance());
+                transactionManager.addTransaction(transaction);
+
+                CustomUtils.printSuccess("Transaction completed successfully!");
+                CustomUtils.print("New Balance: $" + String.format("%.2f", account.getBalance()));
+            } else {
+                CustomUtils.printError("Transaction failed!");
+            }
+        } else {
+            CustomUtils.print("Transaction cancelled.");
+        }
+    }
+
+    private static void handleTransfer(Account sourceAccount) {
+        CustomUtils.printInline("Enter Target Account Number: ");
+        String targetAccountNumber = scanner.nextLine();
+
+        Account targetAccount = accountManager.findAccount(targetAccountNumber);
+        if (targetAccount == null) {
+            CustomUtils.printError("Target account not found!");
+            return;
+        }
+
+        if (sourceAccount.getAccountNumber().equals(targetAccountNumber)) {
+            CustomUtils.printError("Cannot transfer to the same account!");
+            return;
+        }
+
+        // Display target account details
+        CustomUtils.print("\nTarget Account Details:");
+        CustomUtils.print("Customer: " + targetAccount.getCustomer().getName());
+        CustomUtils.print("Account Type: " + targetAccount.getAccountType());
+        CustomUtils.print("Current Balance: $" + String.format("%.2f", targetAccount.getBalance()));
+
+        double amount = InputValidator.getValidDouble(scanner,
+                "Enter transfer amount: $",
+                0.01);
+
+        // Display transfer confirmation
+        displayTransferConfirmation(sourceAccount, targetAccount, amount);
+
+        String confirm = InputValidator.getValidInput(scanner,
+                "\nConfirm transfer? (Y/N): ",
+                InputValidator::isValidConfirmation,
+                "Please enter Y or N");
+
+        if (confirm.equalsIgnoreCase("Y")) {
+            boolean success = sourceAccount.transfer(targetAccount, amount);
+            if (success) {
+                // Record both transactions (withdrawal from source, deposit to target)
+                Transaction withdrawalTransaction = new Transaction(
+                        sourceAccount.getAccountNumber(),
+                        "TRANSFER_OUT",
+                        amount,
+                        sourceAccount.getBalance()
+                );
+                transactionManager.addTransaction(withdrawalTransaction);
+
+                Transaction depositTransaction = new Transaction(
+                        targetAccount.getAccountNumber(),
+                        "TRANSFER_IN",
+                        amount,
+                        targetAccount.getBalance()
+                );
+                transactionManager.addTransaction(depositTransaction);
+
+                CustomUtils.printSuccess("Transfer completed successfully!");
+                CustomUtils.print("\nSource Account:");
+                CustomUtils.print("New Balance: $" + String.format("%.2f", sourceAccount.getBalance()));
+                CustomUtils.print("\nTarget Account:");
+                CustomUtils.print("New Balance: $" + String.format("%.2f", targetAccount.getBalance()));
+            } else {
+                CustomUtils.printError("Transfer failed!");
+            }
+        } else {
+            CustomUtils.print("Transfer cancelled.");
+        }
+    }
+
+    private static void displayTransferConfirmation(Account sourceAccount, Account targetAccount, double amount) {
+        CustomUtils.print("\nTRANSFER CONFIRMATION");
+        CustomUtils.printDivider(40);
+
+        CustomUtils.print("FROM:");
+        CustomUtils.print("  Account: " + sourceAccount.getAccountNumber());
+        CustomUtils.print("  Customer: " + sourceAccount.getCustomer().getName());
+        CustomUtils.print("  Current Balance: $" + String.format("%.2f", sourceAccount.getBalance()));
+
+        CustomUtils.print("\nTO:");
+        CustomUtils.print("  Account: " + targetAccount.getAccountNumber());
+        CustomUtils.print("  Customer: " + targetAccount.getCustomer().getName());
+        CustomUtils.print("  Current Balance: $" + String.format("%.2f", targetAccount.getBalance()));
+
+        CustomUtils.print("\nTRANSFER DETAILS:");
+        CustomUtils.print("  Amount: $" + String.format("%.2f", amount));
+        CustomUtils.print("  From New Balance: $" + String.format("%.2f", sourceAccount.getBalance() - amount));
+        CustomUtils.print("  To New Balance: $" + String.format("%.2f", targetAccount.getBalance() + amount));
+
+        CustomUtils.print("  Date/Time: " + java.time.LocalDateTime.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")));
+        CustomUtils.printDivider(40);
     }
 
     private static void displayTransactionConfirmation(String accountNumber, String type,

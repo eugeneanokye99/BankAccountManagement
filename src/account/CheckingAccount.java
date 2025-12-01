@@ -21,19 +21,6 @@ public class CheckingAccount extends Account {
         return monthlyFee;
     }
 
-    // Apply monthly fee (will be waived for premium customers)
-    public void applyMonthlyFee() {
-        // Check if customer is premium (fee waiver)
-        if (getCustomer().getCustomerType().equals("Premium")) {
-            System.out.println("Monthly fee waived for premium customer.");
-            return;
-        }
-
-        double newBalance = getBalance() - monthlyFee;
-        setBalance(newBalance);
-        System.out.printf("Monthly fee of $%.2f applied. New balance: $%.2f%n", monthlyFee, newBalance);
-    }
-
     // Override withdraw to allow overdraft up to limit
     @Override
     public boolean withdraw(double amount) {
@@ -85,10 +72,4 @@ public class CheckingAccount extends Account {
         return "Checking";
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s | %s | Checking | Balance: $%.2f | %s | Overdraft: $%.2f | Monthly Fee: $%.2f",
-                getAccountNumber(), getCustomer().getName(), getBalance(), getStatus(),
-                overdraftLimit, monthlyFee);
-    }
 }

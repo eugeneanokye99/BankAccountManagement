@@ -50,16 +50,10 @@ public abstract class Customer {
         return address;
     }
 
-    public static int getCustomerCounter() {
-        return customerCounter;
-    }
 
     // Abstract methods
     public abstract void displayCustomerDetails();
     public abstract String getCustomerType();
 
-    @Override
-    public String toString() {
-        return String.format("%s | %s | %s | %d years", customerId, name, getCustomerType(), age);
-    }
+
 }

@@ -73,10 +73,4 @@ public class SavingsAccount extends Account {
         return "Savings";
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s | %s | Savings | Balance: $%.2f | %s | Interest: %.1f%% | Min Balance: $%.2f",
-                getAccountNumber(), getCustomer().getName(), getBalance(), getStatus(),
-                interestRate, minimumBalance);
-    }
 }

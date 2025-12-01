@@ -12,6 +12,7 @@ public class Transaction {
     private final double amount;
     private final double balanceAfter;
     private final String timestamp;
+    private String relatedAccount; //for transfers
 
     public Transaction(String accountNumber, String type, double amount, double balanceAfter) {
         this.transactionId = generateTransactionId();
@@ -20,6 +21,17 @@ public class Transaction {
         this.amount = amount;
         this.balanceAfter = balanceAfter;
         this.timestamp = generateTimestamp();
+    }
+
+    // New constructor for transfers
+    public Transaction(String accountNumber, String type, double amount, double balanceAfter, String relatedAccount) {
+        this.transactionId = generateTransactionId();
+        this.accountNumber = accountNumber;
+        this.type = type.toUpperCase();
+        this.amount = amount;
+        this.balanceAfter = balanceAfter;
+        this.timestamp = generateTimestamp();
+        this.relatedAccount = relatedAccount;
     }
 
     private String generateTransactionId() {
@@ -61,10 +73,21 @@ public class Transaction {
         return transactionCounter;
     }
 
+    public String getRelatedAccount() {
+        return relatedAccount;
+    }
+
+    public void setRelatedAccount(String relatedAccount) {
+        this.relatedAccount = relatedAccount;
+    }
+
     public void displayTransactionDetails() {
         System.out.println("Transaction ID: " + transactionId);
         System.out.println("Account: " + accountNumber);
         System.out.println("Type: " + type);
+        if (relatedAccount != null && (type.equals("TRANSFER_OUT") || type.equals("TRANSFER_IN"))) {
+            System.out.println("Related Account: " + relatedAccount);
+        }
         System.out.println("Amount: $" + String.format("%.2f", amount));
         System.out.println("Balance After: $" + String.format("%.2f", balanceAfter));
         System.out.println("Date/Time: " + timestamp);
