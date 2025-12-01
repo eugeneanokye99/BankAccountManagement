@@ -48,23 +48,8 @@ public class AccountManager {
 
         for (int i = 0; i < accountCount; i++) {
             Account account = accounts[i];
-            System.out.printf("%s | %s | %s | $%.2f | %s%n",
-                    account.getAccountNumber(),
-                    account.getCustomer().getName(),
-                    account.getAccountType(),
-                    account.getBalance(),
-                    account.getStatus());
 
-            // Display account-specific details
-            if (account instanceof account.SavingsAccount) {
-                account.SavingsAccount savings = (account.SavingsAccount) account;
-                System.out.printf("  Interest Rate: %.1f%% Min Balance: $%.2f%n",
-                        savings.getInterestRate(), savings.getMinimumBalance());
-            } else if (account instanceof account.CheckingAccount) {
-                account.CheckingAccount checking = (account.CheckingAccount) account;
-                System.out.printf("  Overdraft Limit: $%.2f Monthly Fee: $%.2f%n",
-                        checking.getOverdraftLimit(), checking.getMonthlyFee());
-            }
+            account.displayAccountDetails();
 
             System.out.println("─".repeat(80));
             totalBalance += account.getBalance();
@@ -72,6 +57,16 @@ public class AccountManager {
 
         System.out.println("Total Accounts: " + accountCount);
         System.out.println("Total Bank Balance: $" + String.format("%.2f", totalBalance));
+    }
+
+    public void displayAccountDetails(String accountNumber) {
+        Account account = findAccount(accountNumber);
+        if (account != null) {
+            System.out.println("\n=== ACCOUNT DETAILS ===");
+            account.displayAccountDetails();
+        } else {
+            System.out.println("Account not found!");
+        }
     }
 
     // Get total balance of all accounts
